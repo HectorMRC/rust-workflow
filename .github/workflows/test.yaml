@@ -103,7 +103,7 @@ jobs:
       when_first_and_second_have_changed
     ]
     
-    if: ${{ !contains(join(needs.*.conclusion), 'failure') }}
+    if: ${{ always() && !contains(join(needs.*.conclusion), 'failure') }}
     
     steps:
       - name: Download checkout
