@@ -3,7 +3,7 @@ name: Run tests
 on: [push, pull_request]
 
 jobs:
-  run_unitary_tests:
+  get_changelog:
     name: Run unitary tests
     runs-on: ubuntu-latest
 
