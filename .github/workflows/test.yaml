@@ -17,6 +17,12 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v29.0.4
 
+      - name: Upload checkout
+        uses: actions/upload-artifact@v3
+        with:
+          name: latest
+          path: .
+
       - name: List all changed files
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
@@ -29,6 +35,14 @@ jobs:
     needs: get_changelog
 
     steps:
+      - name: Download checkout
+        uses: actions/download-artifact@v3
+        with:
+          name: latest
+
+      - name: Display directory
+        run: ls -R
+
       - name: Install Rust
         uses: actions-rs/cargo@1.0.1
 
