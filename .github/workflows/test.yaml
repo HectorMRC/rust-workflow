@@ -3,9 +3,12 @@ name: Run tests
 on: [push, pull_request]
 
 jobs:
-  get_changelog:
-    name: Run unitary tests
+  checkout:
+    name: Checkout code
     runs-on: ubuntu-latest
+
+    outputs:
+      changelog: ${{ steps.changed-files.outputs.all_changed_files }}
 
     steps:
       - name: Checkout code
@@ -23,25 +26,18 @@ jobs:
           name: latest
           path: .
 
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
-
-  run_unitary_tests:
-    name: Run unitary tests
+  first_conditional:
+    name: First member tests
     runs-on: ubuntu-latest
-    needs: get_changelog
+
+    needs: [checkout, unitary_tests]
+    if: contains(needs.checkout.outputs.changelog, 'first_member')
 
     steps:
       - name: Download checkout
         uses: actions/download-artifact@v3
         with:
           name: latest
-
-      - name: Display directory
-        run: ls -R
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -52,4 +48,57 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --verbose
+          args: --package first_member
+        
+  second_conditional:
+    name: Second member tests
+    runs-on: ubuntu-latest
+
+    needs: [checkout, unitary_tests]
+    if: contains(needs.checkout.outputs.changelog, 'second_member')
+
+    steps:
+      - name: Download checkout
+        uses: actions/download-artifact@v3
+        with:
+          name: latest
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --package first_member
+
+  release_version:
+    name: Release version
+    runs-on: ubuntu-latest
+
+    needs: [
+      first_conditional,
+      second_conditional
+    ]
+    if: ${{ contains(github.event.head_commit.message, 'release') }}
+    
+    steps:
+      - name: Download checkout
+        uses: actions/download-artifact@v3
+        with:
+          name: latest
+
+      - name: Create tag
+        id: tagging
+        uses: anothrNick/github-tag-action@1.39.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tagging.outputs.new_tag }}
+          token: ${{ secrets.PAT }}
