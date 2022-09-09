@@ -3,4 +3,5 @@
 members = [
     "first_member",
     "second_member",
+    "third_member",
 ]
