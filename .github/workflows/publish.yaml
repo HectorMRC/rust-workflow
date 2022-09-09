@@ -1,0 +1,14 @@
+name: Publish project
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  on_new_release:
+    name: On new release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Something to do
+        run: echo "pusblish latest tag"
