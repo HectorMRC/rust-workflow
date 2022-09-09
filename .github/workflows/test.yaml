@@ -26,7 +26,7 @@ jobs:
   run_unitary_tests:
     name: Run unitary tests
     runs-on: ubuntu-latest
-    needs: run_unitary_tests
+    needs: get_changelog
 
     steps:
       - name: Install Rust
