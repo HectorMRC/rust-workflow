@@ -27,6 +27,30 @@ jobs:
           path: .
 
   first_conditional:
+    name: Third member tests
+    runs-on: ubuntu-latest
+
+    needs: [checkout]
+    if: contains(needs.checkout.outputs.changelog, 'third_member')
+
+    steps:
+      - name: Download checkout
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.sha }}
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --package third_member
+
+  second_conditional:
     name: First member tests
     runs-on: ubuntu-latest
 
@@ -54,13 +78,13 @@ jobs:
     name: When first has changed
     runs-on: ubuntu-latest
 
-    needs: [first_conditional]
+    needs: [second_conditional]
 
     steps:
       - name: Echo message
         run: echo "something to do"
         
-  second_conditional:
+  third_conditional:
     name: Second member tests
     runs-on: ubuntu-latest
 
@@ -88,35 +112,11 @@ jobs:
     name: When first and second have changed
     runs-on: ubuntu-latest
 
-    needs: [first_conditional, second_conditional]
+    needs: [second_conditional, third_conditional]
 
     steps:
       - name: Echo message
         run: echo "something to do"
-
-  third_conditional:
-    name: Third member tests
-    runs-on: ubuntu-latest
-
-    needs: [checkout]
-    if: contains(needs.checkout.outputs.changelog, 'third_member')
-
-    steps:
-      - name: Download checkout
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ github.sha }}
-
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --package third_member
 
   release_version:
     name: Release version
@@ -125,7 +125,7 @@ jobs:
     needs: [
       when_first_has_changed,
       when_first_and_second_have_changed,
-      third_conditional,
+      first_conditional,
     ]
     
     if: ${{ always() && !contains(join(needs.*.conclusion), 'failure') }}
@@ -156,9 +156,9 @@ jobs:
     needs: [
       checkout,
       release_version,
-      first_conditional,
       second_conditional,
       third_conditional,
+      first_conditional,
       when_first_has_changed,
       when_first_and_second_have_changed
     ]
