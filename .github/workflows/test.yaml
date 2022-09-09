@@ -30,7 +30,7 @@ jobs:
     name: First member tests
     runs-on: ubuntu-latest
 
-    needs: [checkout, unitary_tests]
+    needs: [checkout]
     if: contains(needs.checkout.outputs.changelog, 'first_member')
 
     steps:
@@ -54,7 +54,7 @@ jobs:
     name: Second member tests
     runs-on: ubuntu-latest
 
-    needs: [checkout, unitary_tests]
+    needs: [checkout]
     if: contains(needs.checkout.outputs.changelog, 'second_member')
 
     steps:
