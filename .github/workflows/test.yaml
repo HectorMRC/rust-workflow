@@ -43,8 +43,13 @@ jobs:
       - name: Display directory
         run: ls -R
 
-      - name: Install Rust
-        uses: actions-rs/cargo@v1.0.1
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Cargo test
-        run: cargo test --verbose
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose
