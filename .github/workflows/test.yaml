@@ -107,6 +107,8 @@ jobs:
     name: Clear workspace
     runs-on: ubuntu-latest
 
+    if: ${{ always() }}
+
     steps:
       - name: Delete Artifact
         uses: GeekyEggo/delete-artifact@v1
