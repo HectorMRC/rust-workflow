@@ -85,7 +85,7 @@ jobs:
           args: --package first_member
 
   when_first_and_second_have_changed:
-    name: When first has changed
+    name: When first and second have changed
     runs-on: ubuntu-latest
 
     needs: [first_conditional, second_conditional]
@@ -102,7 +102,8 @@ jobs:
       when_first_has_changed,
       when_first_and_second_have_changed
     ]
-    if: ${{ contains(github.event.head_commit.message, 'release') }}
+    
+    if: !contains(join(steps.*.conclusion), 'failure')
     
     steps:
       - name: Download checkout
