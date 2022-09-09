@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Install Rust
-        uses: icepuma/rust-action@master
+        uses: actions-rs/cargo@1.0.1
 
       - name: Cargo test
         run: cargo test --verbose
