@@ -44,7 +44,7 @@ jobs:
         run: ls -R
 
       - name: Install Rust
-        uses: actions-rs/cargo@1.0.1
+        uses: actions-rs/cargo@v1.0.1
 
       - name: Cargo test
         run: cargo test --verbose
