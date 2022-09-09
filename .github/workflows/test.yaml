@@ -23,7 +23,7 @@ jobs:
       - name: Upload checkout
         uses: actions/upload-artifact@v3
         with:
-          name: ${{GITHUB_SHA}}
+          name: ${{ github.sha }}
           path: .
 
   first_conditional:
@@ -37,7 +37,7 @@ jobs:
       - name: Download checkout
         uses: actions/download-artifact@v3
         with:
-          name: ${{GITHUB_SHA}}
+          name: ${{ github.sha }}
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -61,7 +61,7 @@ jobs:
       - name: Download checkout
         uses: actions/download-artifact@v3
         with:
-          name: ${{GITHUB_SHA}}
+          name: ${{ github.sha }}
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -88,7 +88,7 @@ jobs:
       - name: Download checkout
         uses: actions/download-artifact@v3
         with:
-          name: ${{GITHUB_SHA}}
+          name: ${{ github.sha }}
 
       - name: Create tag
         id: tagging
