@@ -1,4 +1,4 @@
-name: Publish project
+name: Continuous delivery
 
 on:
   release:
