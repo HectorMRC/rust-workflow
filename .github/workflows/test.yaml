@@ -107,6 +107,13 @@ jobs:
     name: Clear workspace
     runs-on: ubuntu-latest
 
+    needs: [
+      checkout,
+      release_version,
+      first_conditional,
+      second_conditional
+    ]
+    
     if: ${{ always() }}
 
     steps:
