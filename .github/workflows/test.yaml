@@ -1,0 +1,36 @@
+name: Run tests
+
+on: [push, pull_request]
+
+jobs:
+  run_unitary_tests:
+    name: Run unitary tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v29.0.4
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
+  run_unitary_tests:
+    name: Run unitary tests
+    runs-on: ubuntu-latest
+    needs: run_unitary_tests
+
+    steps:
+      - name: Install Rust
+        uses: icepuma/rust-action@master
+
+      - name: Cargo test
+        run: cargo test --verbose
