@@ -102,3 +102,13 @@ jobs:
         with:
           tag_name: ${{ steps.tagging.outputs.new_tag }}
           token: ${{ secrets.PAT }}
+
+  clear_workspace: 
+    name: Clear workspace
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete Artifact
+        uses: GeekyEggo/delete-artifact@v1
+        with:
+          name: ${{ github.sha }}
