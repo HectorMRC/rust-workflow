@@ -3,7 +3,7 @@ name: Continuous integration
 on: [push, pull_request]
 
 jobs:
-  checkout:
+  changelog:
     name: Checkout code
     runs-on: ubuntu-latest
 
@@ -20,24 +20,18 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v29.0.4
 
-      - name: Upload checkout
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ github.sha }}
-          path: .
-
   first_conditional:
     name: First member tests
     runs-on: ubuntu-latest
 
-    needs: [checkout]
-    if: contains(needs.checkout.outputs.changelog, 'first_member')
+    needs: [changelog]
+    if: contains(needs.changelog.outputs.changelog, 'first_member')
 
     steps:
-      - name: Download checkout
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
-          name: ${{ github.sha }}
+          fetch-depth: 0
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -54,14 +48,14 @@ jobs:
     name: Second member tests
     runs-on: ubuntu-latest
 
-    needs: [checkout]
-    if: contains(needs.checkout.outputs.changelog, 'second_member')
+    needs: [changelog]
+    if: contains(needs.changelog.outputs.changelog, 'second_member')
 
     steps:
-      - name: Download checkout
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
-          name: ${{ github.sha }}
+          fetch-depth: 0
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -88,14 +82,14 @@ jobs:
     name: Third member tests
     runs-on: ubuntu-latest
 
-    needs: [checkout]
-    if: contains(needs.checkout.outputs.changelog, 'third_member')
+    needs: [changelog]
+    if: contains(needs.changelog.outputs.changelog, 'third_member')
 
     steps:
-      - name: Download checkout
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
-          name: ${{ github.sha }}
+          fetch-depth: 0
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -123,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: [
-      checkout,
+      changelog,
       first_conditional,
       second_conditional,
       when_second_has_changed,
@@ -134,10 +128,10 @@ jobs:
     if: ${{ always() && !contains(join(needs.*.conclusion), 'failure') }}
     
     steps:
-      - name: Download checkout
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
-          name: ${{ github.sha }}
+          fetch-depth: 0
 
       - name: Create tag
         id: tagging
@@ -151,25 +145,3 @@ jobs:
         with:
           tag_name: ${{ steps.tagging.outputs.new_tag }}
           token: ${{ secrets.PAT }}
-
-  clear_workspace: 
-    name: Clear workspace
-    runs-on: ubuntu-latest
-
-    needs: [
-      checkout,
-      release_version,
-      first_conditional,
-      second_conditional,
-      third_conditional,
-      when_second_has_changed,
-      when_second_and_third_have_changed
-    ]
-
-    if: ${{ always() }}
-
-    steps:
-      - name: Delete Artifact
-        uses: GeekyEggo/delete-artifact@v1
-        with:
-          name: ${{ github.sha }}
